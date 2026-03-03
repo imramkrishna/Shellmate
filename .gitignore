@@ -3,3 +3,4 @@ original-claude-code
 dist
 .env
 dev-docs
+config.txt
