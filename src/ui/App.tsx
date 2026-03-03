@@ -12,7 +12,7 @@ export function App({ apiKey, model }: AppProps) {
   return (
     <Box flexDirection="column">
       <Box marginBottom={1} paddingX={1}>
-        <Text>{colors.header("youtube-cc")}</Text>
+        <Text>{colors.header("ShellMate")}</Text>
         <Text>{colors.muted(` (${model})`)}</Text>
       </Box>
       <Box paddingX={1} marginBottom={1}>

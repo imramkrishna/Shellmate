@@ -20,8 +20,8 @@ export class OpenRouterClient {
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
         "Content-Type": "application/json",
-        "HTTP-Referer": "https://github.com/youtube-cc",
-        "X-Title": "youtube-cc",
+        "HTTP-Referer": "https://github.com/ShellMate",
+        "X-Title": "ShellMate",
       },
       body: JSON.stringify({ ...request, stream: true }),
     });
@@ -38,7 +38,7 @@ export class OpenRouterClient {
     }
 
     const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+    const deShellMate = new TextDeShellMate();
     let buffer = "";
 
     try {
@@ -46,7 +46,7 @@ export class OpenRouterClient {
         const { done, value } = await reader.read();
         if (done) break;
 
-        buffer += decoder.decode(value, { stream: true });
+        buffer += deShellMate.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
 
