@@ -38,7 +38,7 @@ export class OpenRouterClient {
     }
 
     const reader = response.body.getReader();
-    const deShellMate = new TextDeShellMate();
+    const decoder = new TextDecoder();
     let buffer = "";
 
     try {
@@ -46,7 +46,7 @@ export class OpenRouterClient {
         const { done, value } = await reader.read();
         if (done) break;
 
-        buffer += deShellMate.decode(value, { stream: true });
+        buffer += decoder.decode(value, { stream: true });
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
 

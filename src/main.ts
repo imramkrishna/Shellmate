@@ -17,7 +17,6 @@ export function createCLI() {
     )
     .action((options) => {
       const apiKey = process.env.OPENROUTER_API_KEY;
-
       if (!apiKey) {
         console.error(
           "Error: OPENROUTER_API_KEY environment variable is required.\n" +
