@@ -12,14 +12,15 @@ import type { MessageLoopCallbacks } from "../core/messageLoop.js";
 interface REPLProps {
   apiKey: string;
   model: string;
-  onFirstMessage?: () => void;
 }
 
-export function REPL({ apiKey, model, onFirstMessage }: REPLProps) {
+export function REPL({ apiKey, model }: REPLProps) {
   const { exit } = useApp();
   const [completedMessages, setCompletedMessages] = useState<
     CompletedMessage[]
-  >([]);
+  >([
+    { id: "0", type: "welcome", content: "", model },
+  ]);
   const [streamingText, setStreamingText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isExecutingTools, setIsExecutingTools] = useState(false);
@@ -40,9 +41,6 @@ export function REPL({ apiKey, model, onFirstMessage }: REPLProps) {
         exit();
         return;
       }
-
-      // Hide welcome screen on first message
-      onFirstMessage?.();
 
       // Add user message
       setCompletedMessages((prev) => [

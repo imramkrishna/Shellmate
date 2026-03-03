@@ -3,13 +3,15 @@ import { Box, Text, Static } from "ink";
 import Spinner from "ink-spinner";
 import type { ToolExecutionResult } from "../../core/toolExecutor.js";
 import { ToolResultDisplay } from "./ToolResult.js";
+import { WelcomeScreen } from "./WelcomeScreen.js";
 import { colors } from "../../utils/colors.js";
 
 export interface CompletedMessage {
   id: string;
-  type: "user" | "assistant" | "tool_results" | "error";
+  type: "user" | "assistant" | "tool_results" | "error" | "welcome";
   content: string;
   toolResults?: ToolExecutionResult[];
+  model?: string;
 }
 
 interface MessageListProps {
@@ -20,6 +22,10 @@ interface MessageListProps {
 }
 
 function MessageContent({ msg }: { msg: CompletedMessage }) {
+  if (msg.type === "welcome") {
+    return <WelcomeScreen model={msg.model || ""} />;
+  }
+
   if (msg.type === "user") {
     return (
       <Box marginBottom={1}>
