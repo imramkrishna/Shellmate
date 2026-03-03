@@ -13,7 +13,7 @@ export function createCLI() {
     .option(
       "-m, --model <model>",
       "Model to use via OpenRouter",
-      "anthropic/claude-sonnet-4"
+      `${process.env.AI_MODEL}`
     )
     .action((options) => {
       const apiKey = process.env.OPENROUTER_API_KEY;
@@ -24,7 +24,6 @@ export function createCLI() {
         );
         process.exit(1);
       }
-
       render(
         React.createElement(App, {
           apiKey,

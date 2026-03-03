@@ -23,14 +23,20 @@ export function TextInput({ onSubmit, isDisabled }: TextInputProps) {
   }
 
   return (
-    <Box>
-      <Text>{colors.prompt("> ")}</Text>
-      <InkTextInput
-        value={value}
-        onChange={setValue}
-        onSubmit={handleSubmit}
-        placeholder="Type a message..."
-      />
+    <Box flexDirection="column">
+      <Box>
+        <Text bold>{colors.prompt("> ")}</Text>
+        <InkTextInput
+          value={value}
+          onChange={setValue}
+          onSubmit={handleSubmit}
+          placeholder='Type a message or "exit" to quit'
+        />
+      </Box>
+      <Box marginLeft={2}>
+        <Text>{colors.muted("? ")}</Text>
+        <Text>{colors.muted("shortcuts")}</Text>
+      </Box>
     </Box>
   );
 }

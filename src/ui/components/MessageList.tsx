@@ -23,14 +23,15 @@ function MessageContent({ msg }: { msg: CompletedMessage }) {
   if (msg.type === "user") {
     return (
       <Box marginBottom={1}>
-        <Text>{colors.prompt("> ")}{msg.content}</Text>
+        <Text bold>{colors.prompt("> ")}</Text>
+        <Text>{msg.content}</Text>
       </Box>
     );
   }
 
   if (msg.type === "assistant") {
     return (
-      <Box marginBottom={1} flexDirection="column">
+      <Box marginBottom={1} marginLeft={1} flexDirection="column">
         <Text>{msg.content}</Text>
       </Box>
     );
@@ -49,7 +50,7 @@ function MessageContent({ msg }: { msg: CompletedMessage }) {
   if (msg.type === "error") {
     return (
       <Box marginBottom={1}>
-        <Text>{colors.error("Error: ")}{msg.content}</Text>
+        <Text>{colors.error("✗ Error: ")}{msg.content}</Text>
       </Box>
     );
   }
@@ -81,8 +82,8 @@ export function MessageList({
       )}
 
       {isExecutingTools && (
-        <Box>
-          <Text>
+        <Box marginLeft={1}>
+          <Text color="#D4845A">
             <Spinner type="dots" />{" "}
           </Text>
           <Text>{colors.muted("Executing tools...")}</Text>
@@ -90,8 +91,8 @@ export function MessageList({
       )}
 
       {isLoading && !streamingText && !isExecutingTools && (
-        <Box>
-          <Text>
+        <Box marginLeft={1}>
+          <Text color="#D4845A">
             <Spinner type="dots" />{" "}
           </Text>
           <Text>{colors.muted("Thinking...")}</Text>

@@ -115,7 +115,7 @@ export function REPL({ apiKey, model }: REPLProps) {
   );
 
   return (
-    <Box flexDirection="column" padding={1}>
+    <Box flexDirection="column" paddingX={1}>
       <MessageList
         completedMessages={completedMessages}
         streamingText={streamingText}

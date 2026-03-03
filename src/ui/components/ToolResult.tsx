@@ -16,13 +16,13 @@ export function ToolResultDisplay({ result }: ToolResultProps) {
     : result.resultSummary;
 
   return (
-    <Box flexDirection="column" marginLeft={1} marginBottom={1}>
+    <Box flexDirection="column" marginLeft={2} marginBottom={1}>
       <Box>
-        <Text>{colors.muted("  ┌ ")}</Text>
+        <Text>{colors.border("  ┌ ")}</Text>
         <Text>{result.callSummary}</Text>
       </Box>
       <Box marginLeft={2}>
-        <Text>{colors.muted("│ ")}</Text>
+        <Text>{colors.border("│ ")}</Text>
         <Text>
           {displayLines}
           {truncated
@@ -31,11 +31,11 @@ export function ToolResultDisplay({ result }: ToolResultProps) {
         </Text>
       </Box>
       <Box>
-        <Text>{colors.muted("  └ ")}</Text>
+        <Text>{colors.border("  └ ")}</Text>
         <Text>
           {result.result.isError
-            ? colors.error("error")
-            : colors.success("done")}
+            ? colors.error("✗ error")
+            : colors.success("✓ done")}
         </Text>
       </Box>
     </Box>

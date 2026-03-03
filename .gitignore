@@ -2,3 +2,4 @@ node_modules
 original-claude-code
 dist
 .env
+dev-docs
