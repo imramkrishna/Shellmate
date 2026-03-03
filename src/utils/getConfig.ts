@@ -1,7 +1,6 @@
 import fs from "fs"
 function getConfig():Map<string,string>{
     let credentials=new Map<string,string>
-    console.log("reading file ")
     let content=fs.readFileSync("config.txt");
     let data=content.toString().trim().split("\n")
     credentials.set("AI_MODEL",data[0].split("=")[1])

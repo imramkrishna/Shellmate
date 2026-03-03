@@ -2,6 +2,8 @@
 
 A lightweight, educational AI coding assistant that runs directly in your terminal. Built to understand the core building blocks of modern terminal AI tools like Claude Code, GitHub Copilot CLI, and Warp AI.
 
+![ShellMate Welcome Screen](ShellMate.png)
+
 ## 🎯 Overview
 
 ShellMate is a TypeScript-based terminal AI assistant that demonstrates the fundamental architecture of AI-powered coding tools. It features a clean REPL interface, tool-based AI interactions, and streaming responses via OpenRouter's API.
