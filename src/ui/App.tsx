@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useCallback } from "react";
 import { Box } from "ink";
 import { REPL } from "./REPL.js";
 import { WelcomeScreen } from "./components/WelcomeScreen.js";
@@ -9,10 +9,16 @@ interface AppProps {
 }
 
 export function App({ apiKey, model }: AppProps) {
+  const [showWelcome, setShowWelcome] = useState(true);
+
+  const hideWelcome = useCallback(() => {
+    setShowWelcome(false);
+  }, []);
+
   return (
     <Box flexDirection="column">
-      <WelcomeScreen model={model} />
-      <REPL apiKey={apiKey} model={model}/>
-    </Box> 
+      {showWelcome && <WelcomeScreen model={model} />}
+      <REPL apiKey={apiKey} model={model} onFirstMessage={hideWelcome} />
+    </Box>
   );
 }
