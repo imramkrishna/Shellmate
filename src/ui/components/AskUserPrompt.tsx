@@ -37,8 +37,8 @@ export function AskUserPrompt({ request, onAnswer }: AskUserPromptProps) {
 
   return (
     <Box flexDirection="column" marginY={1} paddingX={1}>
-      <Box>
-        <Text color="#FBBF24">{"❓ "}</Text>
+      <Box marginLeft={1}>
+        <Text color="#D4845A" bold>{"? "}</Text>
         <Text bold>{request.question}</Text>
       </Box>
 
@@ -51,17 +51,17 @@ export function AskUserPrompt({ request, onAnswer }: AskUserPromptProps) {
       )}
 
       {request.type === "text" && (
-        <Box flexDirection="column" marginLeft={2} marginTop={1}>
+        <Box flexDirection="column" marginLeft={3} marginTop={1}>
           {!request.required && (
-            <Text color="#6B7280">{"  (optional, press Enter to skip)"}</Text>
+            <Text color="#6B7280" dimColor>{"  (optional — press Enter to skip)"}</Text>
           )}
           <Box>
-            <Text bold color="#D4845A">{"> "}</Text>
+            <Text bold color="#D4845A">{"❯ "}</Text>
             <InkTextInput
               value={textValue}
               onChange={setTextValue}
               onSubmit={handleTextSubmit}
-              placeholder="Type your answer..."
+              placeholder="Type your answer…"
             />
           </Box>
         </Box>

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Box, Text, useInput } from "ink";
-import { colors } from "../../utils/colors.js";
 
 interface SelectInputProps {
   items: string[];
@@ -21,22 +20,22 @@ export function SelectInput({ items, onSelect }: SelectInputProps) {
   });
 
   return (
-    <Box flexDirection="column" marginLeft={2}>
+    <Box flexDirection="column" marginLeft={3} marginTop={1}>
       {items.map((item, index) => {
         const isActive = index === activeIndex;
         return (
           <Box key={index}>
-            <Text color={isActive ? "#D4845A" : undefined}>
-              {isActive ? "❯ " : "  "}
+            <Text color={isActive ? "#D4845A" : "#4B5563"}>
+              {isActive ? "● " : "○ "}
             </Text>
-            <Text bold={isActive} color={isActive ? "#D4845A" : undefined}>
+            <Text bold={isActive} color={isActive ? "#F9FAFB" : "#9CA3AF"}>
               {item}
             </Text>
           </Box>
         );
       })}
       <Box marginTop={1}>
-        <Text>{colors.muted("↑/↓ to navigate, Enter to select")}</Text>
+        <Text color="#6B7280" dimColor>{"  ↑↓ navigate  ⏎ select"}</Text>
       </Box>
     </Box>
   );

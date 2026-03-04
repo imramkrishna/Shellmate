@@ -58,23 +58,23 @@ export function TextInput({ onSubmit, isDisabled, commands = [] }: TextInputProp
     <Box flexDirection="column">
       <Box
         borderStyle="round"
-        borderColor="white"
+        borderColor="#4B5563"
         borderLeft={false}
         borderRight={false}
         paddingLeft={1}
         flexDirection="column"
       >
         <Box>
-          <Text bold>{colors.prompt("> ")}</Text>
+          <Text bold color="#D4845A">{"❯ "}</Text>
           <InkTextInput
             value={value}
             onChange={setValue}
             onSubmit={handleSubmit}
-            placeholder='Type a message or "exit" to quit'
+            placeholder='Send a message…'
           />
         </Box>
         <Box>
-          <Text>{colors.muted("  ? for shortcuts")}</Text>
+          <Text color="#6B7280" dimColor>{"  ? shortcuts  ↑↓ history"}</Text>
         </Box>
       </Box>
     </Box>

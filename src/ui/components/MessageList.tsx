@@ -28,17 +28,28 @@ function MessageContent({ msg }: { msg: CompletedMessage }) {
 
   if (msg.type === "user") {
     return (
-      <Box marginBottom={1}>
-        <Text bold>{colors.prompt("> ")}</Text>
-        <Text>{msg.content}</Text>
+      <Box marginBottom={1} marginLeft={1}>
+        <Text color="#D4845A" bold>{"❯ "}</Text>
+        <Text bold>{msg.content}</Text>
       </Box>
     );
   }
 
   if (msg.type === "assistant") {
     return (
-      <Box marginBottom={1} marginLeft={1} flexDirection="column">
-        <Text>{msg.content}</Text>
+      <Box marginBottom={1} marginLeft={2} flexDirection="column">
+        <Box>
+          <Text color="#D4845A">{"┃ "}</Text>
+          <Text color="#9CA3AF" dimColor>{"ShellMate"}</Text>
+        </Box>
+        <Box flexDirection="column" marginLeft={0}>
+          {msg.content.split("\n").map((line, i) => (
+            <Box key={i}>
+              <Text color="#4B5563">{"┃ "}</Text>
+              <Text>{line}</Text>
+            </Box>
+          ))}
+        </Box>
       </Box>
     );
   }
@@ -55,8 +66,9 @@ function MessageContent({ msg }: { msg: CompletedMessage }) {
 
   if (msg.type === "error") {
     return (
-      <Box marginBottom={1}>
-        <Text>{colors.error("✗ Error: ")}{msg.content}</Text>
+      <Box marginBottom={1} marginLeft={2}>
+        <Text color="#EF4444" bold>{"✗ "}</Text>
+        <Text color="#EF4444">{msg.content}</Text>
       </Box>
     );
   }
@@ -82,26 +94,37 @@ export function MessageList({
 
       {/* Live streaming area */}
       {streamingText && (
-        <Box marginBottom={1} flexDirection="column">
-          <Text>{streamingText}</Text>
+        <Box marginBottom={1} marginLeft={2} flexDirection="column">
+          <Box>
+            <Text color="#D4845A">{"┃ "}</Text>
+            <Text color="#9CA3AF" dimColor>{"ShellMate"}</Text>
+          </Box>
+          {streamingText.split("\n").map((line, i) => (
+            <Box key={i}>
+              <Text color="#4B5563">{"┃ "}</Text>
+              <Text>{line}</Text>
+            </Box>
+          ))}
         </Box>
       )}
 
       {isExecutingTools && (
-        <Box marginLeft={1}>
+        <Box marginLeft={2}>
+          <Text color="#4B5563">{"┃ "}</Text>
           <Text color="#D4845A">
             <Spinner type="dots" />{" "}
           </Text>
-          <Text>{colors.muted("Executing tools...")}</Text>
+          <Text>{colors.muted("Running tools…")}</Text>
         </Box>
       )}
 
       {isLoading && !streamingText && !isExecutingTools && (
-        <Box marginLeft={1}>
+        <Box marginLeft={2}>
+          <Text color="#4B5563">{"┃ "}</Text>
           <Text color="#D4845A">
             <Spinner type="dots" />{" "}
           </Text>
-          <Text>{colors.muted("Thinking...")}</Text>
+          <Text>{colors.muted("Thinking…")}</Text>
         </Box>
       )}
     </Box>
