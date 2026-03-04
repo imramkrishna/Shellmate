@@ -62,7 +62,7 @@ interface WelcomeScreenProps {
 
 export function WelcomeScreen({
   model,
-  version = "1.0.0",
+  version = "1.0.5",
 }: WelcomeScreenProps) {
   const { stdout } = useStdout();
   const termW = stdout?.columns || 80;
