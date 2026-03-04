@@ -7,7 +7,7 @@ function question(rl: readline.Interface, prompt: string): Promise<string> {
 }
 
 async function generateConfig() {
-    if (fs.existsSync("config.txt")) {
+    if (fs.existsSync(".shellmate/keys.txt")) {
         return;
     }
 
@@ -21,7 +21,8 @@ async function generateConfig() {
     const API_KEY = await question(rl, "Enter Open Router Api Key : ")
 
     const fileContent = `AI_MODEL=${AI_MODEL}\nAPI_KEY=${API_KEY}`
-    fs.writeFileSync("config.txt", fileContent)
+    fs.mkdirSync(".shellmate", { recursive: true })
+    fs.writeFileSync(".shellmate/keys.txt", fileContent)
     console.log(`Configuration for ${AI_MODEL} Model Initialized!`)
     rl.close()
 }
