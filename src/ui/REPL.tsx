@@ -30,6 +30,7 @@ export function REPL({ apiKey, model }: REPLProps) {
   const [streamingText, setStreamingText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isExecutingTools, setIsExecutingTools] = useState(false);
+  const [commands, setCommands] = useState<string[]>([]);
   const msgIdRef = useRef(0);
 
   // Ask-user bridge state
@@ -88,6 +89,7 @@ export function REPL({ apiKey, model }: REPLProps) {
         ...prev,
         { id: nextId(), type: "user", content: input },
       ]);
+      setCommands((prev) => [...prev, input]);
       setIsLoading(true);
       setStreamingText("");
 
@@ -168,7 +170,7 @@ export function REPL({ apiKey, model }: REPLProps) {
       {pendingRequest ? (
         <AskUserPrompt request={pendingRequest} onAnswer={handleUserAnswer} />
       ) : (
-        <TextInput onSubmit={handleSubmit} isDisabled={isLoading} />
+        <TextInput onSubmit={handleSubmit} isDisabled={isLoading} commands={commands} />
       )}
     </Box>
   );
