@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from "react";
-import { Box, useApp } from "ink";
+import { Box, useApp, useInput } from "ink";
 import { TextInput } from "./components/TextInput.js";
 import { AskUserPrompt } from "./components/AskUserPrompt.js";
 import {
@@ -30,8 +30,8 @@ export function REPL({ apiKey, model }: REPLProps) {
   const [streamingText, setStreamingText] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isExecutingTools, setIsExecutingTools] = useState(false);
+  const [commands,setCommands]=useState<string[]>([])
   const msgIdRef = useRef(0);
-
   // Ask-user bridge state
   const [pendingRequest, setPendingRequest] = useState<UserInputRequest | null>(null);
   const resolverRef = useRef<((answer: string) => void) | null>(null);
@@ -88,6 +88,7 @@ export function REPL({ apiKey, model }: REPLProps) {
         ...prev,
         { id: nextId(), type: "user", content: input },
       ]);
+      setCommands(prev => [...prev, input])
       setIsLoading(true);
       setStreamingText("");
 
@@ -168,7 +169,7 @@ export function REPL({ apiKey, model }: REPLProps) {
       {pendingRequest ? (
         <AskUserPrompt request={pendingRequest} onAnswer={handleUserAnswer} />
       ) : (
-        <TextInput onSubmit={handleSubmit} isDisabled={isLoading} />
+        <TextInput onSubmit={handleSubmit} isDisabled={isLoading} commands={commands}/>
       )}
     </Box>
   );
