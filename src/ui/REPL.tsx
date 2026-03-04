@@ -1,6 +1,7 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Box, useApp } from "ink";
 import { TextInput } from "./components/TextInput.js";
+import { AskUserPrompt } from "./components/AskUserPrompt.js";
 import {
   MessageList,
   type CompletedMessage,
@@ -8,6 +9,11 @@ import {
 import { Conversation } from "../core/query.js";
 import { OpenRouterClient } from "../api/client.js";
 import type { MessageLoopCallbacks } from "../core/messageLoop.js";
+import {
+  setInputHandler,
+  clearInputHandler,
+  type UserInputRequest,
+} from "../utils/askUserBridge.js";
 
 interface REPLProps {
   apiKey: string;
@@ -25,6 +31,41 @@ export function REPL({ apiKey, model }: REPLProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [isExecutingTools, setIsExecutingTools] = useState(false);
   const msgIdRef = useRef(0);
+
+  // Ask-user bridge state
+  const [pendingRequest, setPendingRequest] = useState<UserInputRequest | null>(null);
+  const resolverRef = useRef<((answer: string) => void) | null>(null);
+
+  // Register the input handler bridge on mount
+  useEffect(() => {
+    setInputHandler((request: UserInputRequest) => {
+      // Reject any previous pending promise before creating a new one to prevent hanging when two quicks questions are asked
+      if (resolverRef.current) {
+        resolverRef.current("");  // settle the old promise with empty string
+      }
+      return new Promise<string>((resolve) => {
+        resolverRef.current = resolve;
+        setPendingRequest(request);
+      });
+    });
+    return () => {
+      // Settle any pending promise before clearing the handler
+      if (resolverRef.current) {
+        resolverRef.current("");
+        resolverRef.current = null;
+      }
+      setPendingRequest(null);
+      clearInputHandler();
+    };
+  }, []);
+
+  const handleUserAnswer = useCallback((answer: string) => {
+    if (resolverRef.current) {
+      resolverRef.current(answer);
+      resolverRef.current = null;
+    }
+    setPendingRequest(null);
+  }, []);
 
   const conversationRef = useRef(
     new Conversation(new OpenRouterClient(apiKey), model)
@@ -124,7 +165,11 @@ export function REPL({ apiKey, model }: REPLProps) {
         isLoading={isLoading}
         isExecutingTools={isExecutingTools}
       />
-      <TextInput onSubmit={handleSubmit} isDisabled={isLoading} />
+      {pendingRequest ? (
+        <AskUserPrompt request={pendingRequest} onAnswer={handleUserAnswer} />
+      ) : (
+        <TextInput onSubmit={handleSubmit} isDisabled={isLoading} />
+      )}
     </Box>
   );
 }
