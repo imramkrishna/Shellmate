@@ -1,4 +1,4 @@
-import z from "zod";
+import {z} from "zod";
 import { Tool, ToolResult } from "./types.js";
 import { requestUserInput } from "../utils/askUserBridge.js";
 
