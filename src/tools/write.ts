@@ -19,9 +19,20 @@ export const writeTool: Tool = {
     const { file_path, content } = inputSchema.parse(input);
 
     try {
+      let fileExists = false;
+      try {
+        await fs.access(file_path);
+        fileExists = true;
+      } catch {
+        fileExists = false;
+      }
+      if(fileExists){
+        return{
+          output:`The file or folder already exists. Ask the user if they want to replace the whole file into new one or create a new file.`
+        }
+      }
       await fs.mkdir(path.dirname(file_path), { recursive: true });
       await fs.writeFile(file_path, content, "utf-8");
-
       const lines = content.split("\n").length;
       return {
         output: `Successfully wrote ${lines} lines to ${file_path}`,
