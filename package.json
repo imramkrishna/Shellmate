@@ -1,14 +1,38 @@
 {
-  "name": "ShellMate",
+  "name": "shellmate-cli",
   "version": "1.0.0",
+  "description": "AI Powered CLI tool",
+  "author": "Ram Krishna Yadav",
+  "license": "MIT",
+  "homepage": "https://github.com/imramkrishna/shellmate",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/imramkrishna/shellmate"
+  },
   "bin": {
-    "cc": "./dist/index.js"
+    "cc": "./dist/index.js",
+    "shellmate": "./dist/index.js"
   },
   "scripts": {
     "dev": "tsx src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cli",
+    "ai",
+    "terminal",
+    "shell-mate",
+    "openrouter"
+  ],
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
   },
   "dependencies": {
     "chalk": "^5.3.0",

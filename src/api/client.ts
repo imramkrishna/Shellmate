@@ -23,7 +23,7 @@ export class OpenRouterClient {
         "HTTP-Referer": "https://github.com/ShellMate",
         "X-Title": "ShellMate",
       },
-      body: JSON.stringify({ ...request, stream: true, max_tokens:2000 }),
+      body: JSON.stringify({ ...request, stream: true, max_tokens:2000}),
     });
 
     if (!response.ok) {
