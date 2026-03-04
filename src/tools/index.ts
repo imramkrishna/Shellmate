@@ -7,6 +7,7 @@ import { writeTool } from "./write.js";
 import { editTool } from "./edit.js";
 import { globTool } from "./glob.js";
 import { grepTool } from "./grep.js";
+import { askUser } from "./askUser.js";
 
 const toolRegistry = new Map<string, Tool>();
 
@@ -20,6 +21,7 @@ registerTool(writeTool);
 registerTool(editTool);
 registerTool(globTool);
 registerTool(grepTool);
+registerTool(askUser)
 
 export function getTool(name: string): Tool | undefined {
   return toolRegistry.get(name);
