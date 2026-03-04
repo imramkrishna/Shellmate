@@ -1,7 +1,6 @@
 import z from "zod";
 import { Tool, ToolResult } from "./types.js";
-import * as readline from "readline";
-import chalk from "chalk";
+import { requestUserInput } from "../utils/askUserBridge.js";
 
 const inputSchema = z.object({
   question: z.string()
@@ -17,20 +16,6 @@ const inputSchema = z.object({
     .describe("Whether the user must answer this question")
 });
 
-function promptUser(question: string): Promise<string> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-  });
-
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer.trim());
-    });
-  });
-}
-
 export const askUser: Tool = {
   name: "ask_user",
   description: "Ask the user when more information is needed about any operation.",
@@ -38,47 +23,17 @@ export const askUser: Tool = {
 
   async call(input): Promise<ToolResult> {
     const { question, options, type, required } = inputSchema.parse(input);
-    if (type === "confirm") {
-      console.log(chalk.yellow(`\n❓ ${question} (yes/no)`));
-      const answer = await promptUser(chalk.cyan("> "));
-      const confirmed = ["yes", "y"].includes(answer.toLowerCase());
-      return {
-        isError: false,
-        output: confirmed ? "yes" : "no"
-      };
-    }
-    if (type === "select" && options && options.length > 0) {
-      console.log(chalk.yellow(`\n❓ ${question}`));
-      options.forEach((opt, i) => {
-        console.log(chalk.cyan(`  ${i + 1}. ${opt}`));
-      });
 
-      const answer = await promptUser(chalk.cyan("\n> "));
-
-      const index = parseInt(answer) - 1;
-      const selected = !isNaN(index) && options[index]
-        ? options[index]
-        : answer;
-
-      return {
-        isError: false,
-        output: selected
-      };
-    }
-    console.log(chalk.yellow(`\n❓ ${question}`));
-    if (!required) {
-      console.log(chalk.gray("  (optional, press enter to skip)"));
-    }
-
-    const answer = await promptUser(chalk.cyan("> "));
-
-    if (required && !answer) {
-      return this.call(input);
-    }
+    const answer = await requestUserInput({
+      question,
+      options,
+      type,
+      required,
+    });
 
     return {
       isError: false,
-      output: answer || ""
+      output: answer || "",
     };
   },
 
