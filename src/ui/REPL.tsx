@@ -39,12 +39,24 @@ export function REPL({ apiKey, model }: REPLProps) {
   // Register the input handler bridge on mount
   useEffect(() => {
     setInputHandler((request: UserInputRequest) => {
+      // Reject any previous pending promise before creating a new one to prevent hanging when two quicks questions are asked
+      if (resolverRef.current) {
+        resolverRef.current("");  // settle the old promise with empty string
+      }
       return new Promise<string>((resolve) => {
         resolverRef.current = resolve;
         setPendingRequest(request);
       });
     });
-    return () => clearInputHandler();
+    return () => {
+      // Settle any pending promise before clearing the handler
+      if (resolverRef.current) {
+        resolverRef.current("");
+        resolverRef.current = null;
+      }
+      setPendingRequest(null);
+      clearInputHandler();
+    };
   }, []);
 
   const handleUserAnswer = useCallback((answer: string) => {

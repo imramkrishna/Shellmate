@@ -23,7 +23,12 @@ export const askUser: Tool = {
 
   async call(input): Promise<ToolResult> {
     const { question, options, type, required } = inputSchema.parse(input);
-
+    if(type=="select" && (!options || options?.length==0)){
+      return{
+        isError:true,
+        output:"ask_user with type='select' requires a non-empty options array."
+      }
+    }
     const answer = await requestUserInput({
       question,
       options,
