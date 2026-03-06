@@ -35,8 +35,8 @@ export const analyzeFileAndFolders: Tool = {
     },
     renderResult(result) {
         if (result.isError) {
-            return colors.error(result.output);
+            return colors.error(String(result.output));
         }
-        return result.output;
+        return JSON.stringify(result.output, null, 2);
     },
 }

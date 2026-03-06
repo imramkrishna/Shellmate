@@ -14,27 +14,36 @@ export interface FilesResult {
         exports: MapIterator<string>;
     }
 }
+const project = new Project({
+    skipAddingFilesFromTsConfig: true,
+    skipFileDependencyResolution: true,  // 👈 stops it from following imports
+    compilerOptions: {
+        skipLibCheck: true,                 // 👈 skip type checking
+        noResolve: true,                    // 👈 don't resolve modules
+        allowJs: true,
+    }
+});
 async function analyzeFolder(dir: string): Promise<FilesResult[]> {
-    let filesAndFolders: FilesResult[] = []
+    const SKIP = ["node_modules", ".git", "dist", ".next", "build", "coverage",".venv"];
 
-    const entries = await readdir(dir, { withFileTypes: true })
+    let results: FilesResult[] = [];
+    const entries = await readdir(dir, { withFileTypes: true });
 
     for (const entry of entries) {
-        if (entry.isDirectory()) {
-            await analyzeFolder(path.join(dir, entry.name))
-        } else {
-            const fullPath = path.join(dir, entry.name)
-            let analyze = await getAnalysis(fullPath)
-            filesAndFolders.push({
-                name: entry.name,
-                parentPath: dir,
-                path: fullPath,
-                analysis: analyze
-            })
-        }
+        if (SKIP.includes(entry.name)) continue;
 
+        const fullPath = path.join(dir, entry.name);
+
+        if (entry.isDirectory()) {
+            await analyzeFolder(fullPath);
+        } else {
+            const ext = path.extname(entry.name);
+            const analysis = await getAnalysis(fullPath);
+            results.push({ name: entry.name, parentPath: dir, path: fullPath, analysis });
+        }
     }
-    return filesAndFolders
+
+    return results;
 }
 
 async function analyzeFile(path: string): Promise<FilesResult[]> {
@@ -49,15 +58,6 @@ async function analyzeFile(path: string): Promise<FilesResult[]> {
     return filesAndFolders
 }
 async function getAnalysis(filePath: string) {
-    const project = new Project({
-        skipAddingFilesFromTsConfig: true,
-        skipFileDependencyResolution: true,  // 👈 stops it from following imports
-        compilerOptions: {
-            skipLibCheck: true,                 // 👈 skip type checking
-            noResolve: true,                    // 👈 don't resolve modules
-            allowJs: true,
-        }
-    });
     const file = project.addSourceFileAtPath(filePath);
     return {
         functions: file.getFunctions().map(f => ({
@@ -71,7 +71,6 @@ async function getAnalysis(filePath: string) {
         exports: file.getExportedDeclarations().keys()
     };
 }
-
 export {
     analyzeFile,
     analyzeFolder

@@ -9,7 +9,8 @@ interface ToolResultProps {
 
 export function ToolResultDisplay({ result }: ToolResultProps) {
   const maxLines = 15;
-  const resultLines = result.resultSummary.split("\n");
+  const summary = typeof result.resultSummary === "string" ? result.resultSummary : JSON.stringify(result.resultSummary, null, 2);
+  const resultLines = summary.split("\n");
   const truncated = resultLines.length > maxLines;
   const displayLines = truncated
     ? resultLines.slice(0, maxLines)
