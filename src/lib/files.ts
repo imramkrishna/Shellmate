@@ -16,15 +16,15 @@ export interface FilesResult {
 }
 const project = new Project({
     skipAddingFilesFromTsConfig: true,
-    skipFileDependencyResolution: true,  // 👈 stops it from following imports
+    skipFileDependencyResolution: true,
     compilerOptions: {
-        skipLibCheck: true,                 // 👈 skip type checking
-        noResolve: true,                    // 👈 don't resolve modules
+        skipLibCheck: true,
+        noResolve: true,
         allowJs: true,
     }
 });
 async function analyzeFolder(dir: string): Promise<FilesResult[]> {
-    const SKIP = ["node_modules", ".git", "dist", ".next", "build", "coverage",".venv"];
+    const SKIP = ["node_modules", ".git", "dist", ".next", "build", "coverage", ".venv"];
 
     let results: FilesResult[] = [];
     const entries = await readdir(dir, { withFileTypes: true });
@@ -35,9 +35,9 @@ async function analyzeFolder(dir: string): Promise<FilesResult[]> {
         const fullPath = path.join(dir, entry.name);
 
         if (entry.isDirectory()) {
-            await analyzeFolder(fullPath);
+            const nested = await analyzeFolder(fullPath);
+            results.push(...nested);
         } else {
-            const ext = path.extname(entry.name);
             const analysis = await getAnalysis(fullPath);
             results.push({ name: entry.name, parentPath: dir, path: fullPath, analysis });
         }
