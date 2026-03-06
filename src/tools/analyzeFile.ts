@@ -1,0 +1,42 @@
+import { z } from "zod"
+import { Tool, ToolResult } from "./types.js"
+import { analyzeFile, analyzeFolder } from "../lib/files.js";
+import { colors } from "../utils/colors.js";
+
+const inputSchema = z.object({
+    path: z.string()
+        .default(process.cwd())
+        .describe("Path to a file or folder to analyze. Defaults to current working directory."),
+    type: z.enum(["file", "folder"]).default("folder"),
+    recursive: z.boolean().default(true),
+    extensions: z.array(z.string()).default([".ts", ".js", ".tsx", ".jsx"])
+});
+export const analyzeFileAndFolders: Tool = {
+    name: "Abstract Syntax Tree Analyzer",
+    description: "Analyzes the structure of a file or folder using AST (Abstract Syntax Tree). Use this tool when you need to understand code structure before making changes — extracts functions, classes, imports, exports, and variable declarations without reading raw file content. Prefer this over read_file when refactoring, finding unused code, or understanding how a codebase is organized.",
+    inputSchema,
+    async call(input): Promise<ToolResult> {
+        const { path, type, recursive, extensions } = inputSchema.parse(input)
+        let analysis
+        if (type == "folder") {
+            analysis = await analyzeFolder(path)
+        } else {
+            analysis = await analyzeFile(path)
+        }
+        return {
+            isError: false,
+            output: analysis
+        }
+    },
+    renderToolCall(input): string {
+        const parsed = inputSchema.parse(input);
+        if (parsed.type == "file") return `Analysing the File ${parsed.path}`
+        else return `Analysing the Folder Structure ${parsed.path}`
+    },
+    renderResult(result) {
+        if (result.isError) {
+            return colors.error(result.output);
+        }
+        return result.output;
+    },
+}
