@@ -11,7 +11,7 @@ export interface FilesResult {
         { name: string | undefined; params: string[]; returnType: string; lineNumber: number; }[];
         classes: (string | undefined)[];
         imports: string[];
-        exports: MapIterator<string>;
+        exports: string[];
     }
 }
 const project = new Project({
@@ -68,9 +68,16 @@ async function getAnalysis(filePath: string) {
         })),
         classes: file.getClasses().map(c => c.getName()),
         imports: file.getImportDeclarations().map(i => i.getModuleSpecifierValue()),
-        exports: file.getExportedDeclarations().keys()
+        exports: [...file.getExportedDeclarations().keys()]
     };
 }
+async function main(){
+    let result1=await analyzeFile("src/utils/getConfig.ts")
+    let result2=await analyzeFolder("src/tools")
+    console.log("File Result : ",result1);
+    console.log("Folders Result : ",result2)
+}
+main()
 export {
     analyzeFile,
     analyzeFolder
