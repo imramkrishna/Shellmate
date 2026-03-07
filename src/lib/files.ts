@@ -71,13 +71,7 @@ async function getAnalysis(filePath: string) {
         exports: [...file.getExportedDeclarations().keys()]
     };
 }
-async function main(){
-    let result1=await analyzeFile("src/utils/getConfig.ts")
-    let result2=await analyzeFolder("src/tools")
-    console.log("File Result : ",result1);
-    console.log("Folders Result : ",result2)
-}
-main()
+
 export {
     analyzeFile,
     analyzeFolder

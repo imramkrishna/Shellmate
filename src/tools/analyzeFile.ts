@@ -8,15 +8,13 @@ const inputSchema = z.object({
         .default(process.cwd())
         .describe("Path to a file or folder to analyze. Defaults to current working directory."),
     type: z.enum(["file", "folder"]).default("folder"),
-    recursive: z.boolean().default(true),
-    extensions: z.array(z.string()).default([".ts", ".js", ".tsx", ".jsx"])
 });
 export const analyzeFileAndFolders: Tool = {
-    name: "Abstract Syntax Tree Analyzer",
+    name: "analyze_file_structure",
     description: "Analyzes the structure of a file or folder using AST (Abstract Syntax Tree). Use this tool when you need to understand code structure before making changes — extracts functions, classes, imports, exports, and variable declarations without reading raw file content. Prefer this over read_file when refactoring, finding unused code, or understanding how a codebase is organized.",
     inputSchema,
     async call(input): Promise<ToolResult> {
-        const { path, type, recursive, extensions } = inputSchema.parse(input)
+        const { path, type } = inputSchema.parse(input)
         let analysis
         if (type == "folder") {
             analysis = await analyzeFolder(path)
