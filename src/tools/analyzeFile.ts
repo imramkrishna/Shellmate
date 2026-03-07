@@ -14,16 +14,12 @@ export const analyzeFileAndFolders: Tool = {
     description: "Analyzes the structure of a file or folder using AST (Abstract Syntax Tree). Use this tool when you need to understand code structure before making changes — extracts functions, classes, imports, exports, and variable declarations without reading raw file content. Prefer this over read_file when refactoring, finding unused code, or understanding how a codebase is organized.",
     inputSchema,
     async call(input): Promise<ToolResult> {
-        const { path, type } = inputSchema.parse(input)
-        let analysis
-        if (type == "folder") {
-            analysis = await analyzeFolder(path)
-        } else {
-            analysis = await analyzeFile(path)
-        }
-        return {
-            isError: false,
-            output: analysis
+        try {
+            const { path, type } = inputSchema.parse(input)
+            let analysis = type === "folder" ? await analyzeFolder(path) : await analyzeFile(path)
+            return { isError: false, output: analysis }
+        } catch (err) {
+            return { isError: true, output: String(err) }
         }
     },
     renderToolCall(input): string {

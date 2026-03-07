@@ -9,8 +9,8 @@ export interface FilesResult {
     analysis: {
         functions:
         { name: string | undefined; params: string[]; returnType: string; lineNumber: number; }[];
-        classes: (string | undefined)[];
-        imports: string[];
+        classes: { name: string | undefined; methods: { name: string; params: { name: string; type: string; }[]; returnType: string; lineNumber: number; }[]; properties: { name: string; type: string; }[]; }[];
+        imports: { source: string; specifiers: { name: string; isTypeOnly: boolean; }[]; defaultImport: string | null; }[];
         exports: string[];
     }
 }
@@ -115,7 +115,7 @@ async function analyzeFolder(dir: string): Promise<FilesResult[]> {
         if (entry.isDirectory()) {
             const nested = await analyzeFolder(fullPath);
             results.push(...nested);
-        } else if(entry.isFile() && SOURCE_EXTENSIONS.has(path.extname(entry.name))){
+        } else if (entry.isFile() && SOURCE_EXTENSIONS.has(path.extname(entry.name))) {
             const analysis = await getAnalysis(fullPath);
             results.push({ name: entry.name, parentPath: dir, path: fullPath, analysis });
         }
@@ -136,7 +136,12 @@ async function analyzeFile(path: string): Promise<FilesResult[]> {
     return filesAndFolders
 }
 async function getAnalysis(filePath: string) {
-    const file = project.addSourceFileAtPath(filePath);
+    let file = project.addSourceFileAtPath(filePath);
+    if (file) {
+        file.refreshFromFileSystemSync();
+    } else {
+        file = project.addSourceFileAtPath(filePath);
+    }
     return {
         functions: file.getFunctions().map(f => ({
             name: f.getName(),
@@ -144,8 +149,30 @@ async function getAnalysis(filePath: string) {
             returnType: f.getReturnTypeNode()?.getText() || "unknown",
             lineNumber: f.getStartLineNumber()
         })),
-        classes: file.getClasses().map(c => c.getName()),
-        imports: file.getImportDeclarations().map(i => i.getModuleSpecifierValue()),
+        classes: file.getClasses().map(c => ({
+            name: c.getName(),
+            methods: c.getMethods().map(m => ({
+                name: m.getName(),
+                params: m.getParameters().map(p => ({
+                    name: p.getName(),
+                    type: p.getTypeNode()?.getText() || "unknown"
+                })),
+                returnType: m.getReturnTypeNode()?.getText() || "unknown",
+                lineNumber: m.getStartLineNumber()
+            })),
+            properties: c.getProperties().map(p => ({
+                name: p.getName(),
+                type: p.getTypeNode()?.getText() || "unknown"
+            }))
+        })),
+        imports: file.getImportDeclarations().map(i => ({
+            source: i.getModuleSpecifierValue(),
+            specifiers: i.getNamedImports().map(n => ({
+                name: n.getName(),
+                isTypeOnly: n.isTypeOnly() || i.isTypeOnly()
+            })),
+            defaultImport: i.getDefaultImport()?.getText() || null
+        })),
         exports: [...file.getExportedDeclarations().keys()]
     };
 }
