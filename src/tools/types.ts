@@ -1,10 +1,9 @@
-import { z } from "zod";
-
+import { FilesResult } from "../lib/files.js";
+import {z} from "zod";
 export interface ToolResult {
-  output: string;
+  output: string | any;
   isError?: boolean;
 }
-
 export interface Tool {
   name: string;
   description: string;

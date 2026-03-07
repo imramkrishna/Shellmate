@@ -1,15 +1,22 @@
-import React from "react";
 import { Box, Text } from "ink";
 import type { ToolExecutionResult } from "../../core/toolExecutor.js";
 import { colors } from "../../utils/colors.js";
-
+import { inspect } from "node:util";
 interface ToolResultProps {
   result: ToolExecutionResult;
 }
 
 export function ToolResultDisplay({ result }: ToolResultProps) {
   const maxLines = 15;
-  const resultLines = result.resultSummary.split("\n");
+  const summary = 
+  typeof result.resultSummary === "string" 
+  ? result.resultSummary 
+  : inspect(result.resultSummary,{
+    depth:5,
+    colors:false,
+    compact:false
+  })
+  const resultLines = summary.split("\n");
   const truncated = resultLines.length > maxLines;
   const displayLines = truncated
     ? resultLines.slice(0, maxLines)
