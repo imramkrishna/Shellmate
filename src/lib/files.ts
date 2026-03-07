@@ -1,6 +1,6 @@
 import { readdir } from "fs/promises"
 import path from "path"
-import { Project, SyntaxKind } from "ts-morph"
+import { Project } from "ts-morph"
 
 export interface FilesResult {
     name: string
@@ -24,8 +24,86 @@ const project = new Project({
     }
 });
 async function analyzeFolder(dir: string): Promise<FilesResult[]> {
-    const SKIP = ["node_modules", ".git", "dist", ".next", "build", "coverage", ".venv"];
-
+    const SKIP = [
+        // Version control
+        ".git", ".svn", ".hg",
+        // JavaScript / TypeScript
+        "node_modules", "dist", "build", ".next", ".nuxt", ".output", "coverage", ".turbo",
+        // Python
+        ".venv", "venv", "env", "__pycache__", ".mypy_cache", ".pytest_cache", ".tox", "*.egg-info",
+        // Java / Kotlin / Scala
+        "target", ".gradle", ".idea", "out",
+        // C / C++ / CMake
+        "cmake-build-debug", "cmake-build-release",
+        // .NET / C#
+        "bin", "obj", ".vs",
+        // Ruby
+        "vendor", ".bundle",
+        // Go
+        "vendor",
+        // Rust
+        // ("target" already listed above)
+        // PHP
+        // ("vendor" already listed above)
+        // Dart / Flutter
+        ".dart_tool", ".pub-cache",
+        // Swift / Xcode
+        ".build", "DerivedData", "Pods",
+        // Elixir
+        "_build", "deps",
+        // General
+        ".cache", ".tmp", "tmp", "temp", ".DS_Store", "Thumbs.db",
+    ];
+    const SOURCE_EXTENSIONS = new Set([
+        // JavaScript / TypeScript
+        ".ts", ".tsx", ".js", ".jsx", ".mts", ".cts", ".mjs", ".cjs",
+        // Python
+        ".py", ".pyw", ".pyi",
+        // Java / Kotlin / Scala
+        ".java", ".kt", ".kts", ".scala",
+        // C / C++ / Objective-C
+        ".c", ".h", ".cpp", ".cxx", ".cc", ".hpp", ".hxx", ".m", ".mm",
+        // C#
+        ".cs",
+        // Go
+        ".go",
+        // Rust
+        ".rs",
+        // Ruby
+        ".rb", ".erb",
+        // PHP
+        ".php",
+        // Swift
+        ".swift",
+        // Dart
+        ".dart",
+        // Lua
+        ".lua",
+        // Shell
+        ".sh", ".bash", ".zsh", ".fish",
+        // Elixir / Erlang
+        ".ex", ".exs", ".erl",
+        // Haskell
+        ".hs",
+        // R
+        ".r", ".R",
+        // Perl
+        ".pl", ".pm",
+        // Zig
+        ".zig",
+        // Nim
+        ".nim",
+        // Julia
+        ".jl",
+        // Web / Markup
+        ".html", ".htm", ".css", ".scss", ".sass", ".less", ".vue", ".svelte",
+        // Config / Data
+        ".json", ".yaml", ".yml", ".toml", ".xml", ".graphql", ".gql",
+        // SQL
+        ".sql",
+        // Markdown / Docs
+        ".md", ".mdx",
+    ]);
     let results: FilesResult[] = [];
     const entries = await readdir(dir, { withFileTypes: true });
 
@@ -37,7 +115,7 @@ async function analyzeFolder(dir: string): Promise<FilesResult[]> {
         if (entry.isDirectory()) {
             const nested = await analyzeFolder(fullPath);
             results.push(...nested);
-        } else {
+        } else if(entry.isFile() && SOURCE_EXTENSIONS.has(path.extname(entry.name))){
             const analysis = await getAnalysis(fullPath);
             results.push({ name: entry.name, parentPath: dir, path: fullPath, analysis });
         }
