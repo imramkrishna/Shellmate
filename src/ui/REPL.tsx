@@ -14,7 +14,8 @@ import {
   clearInputHandler,
   type UserInputRequest,
 } from "../utils/askUserBridge.js";
-
+import { AskSystemMessage } from "./components/AskSystemMessage.js";
+import { changeModelRequests, systemAction } from "./lib/shortcuts.js";
 interface REPLProps {
   apiKey: string;
   model: string;
@@ -36,8 +37,8 @@ export function REPL({ apiKey, model }: REPLProps) {
   // Ask-user bridge state
   const [pendingRequest, setPendingRequest] = useState<UserInputRequest | null>(null);
   const resolverRef = useRef<((answer: string) => void) | null>(null);
-
-  // Register the input handler bridge on mount
+  const [systemRequests, setSystemRequests] = useState<UserInputRequest[] | null>(null);
+  const systemRequestTypeRef = useRef<string | null>(null);
   useEffect(() => {
     setInputHandler((request: UserInputRequest) => {
       // Reject any previous pending promise before creating a new one to prevent hanging when two quicks questions are asked
@@ -83,8 +84,11 @@ export function REPL({ apiKey, model }: REPLProps) {
         exit();
         return;
       }
-
-      // Add user message
+      if (input.toLowerCase() === "/change-model" || input.toLowerCase() === "change-model") {
+        systemRequestTypeRef.current = "change-model";
+        setSystemRequests(changeModelRequests);
+        return;
+      }
       setCompletedMessages((prev) => [
         ...prev,
         { id: nextId(), type: "user", content: input },
@@ -167,7 +171,29 @@ export function REPL({ apiKey, model }: REPLProps) {
         isLoading={isLoading}
         isExecutingTools={isExecutingTools}
       />
-      {pendingRequest ? (
+
+      {systemRequests ? (
+        <AskSystemMessage
+          requests={systemRequests}
+          onComplete={(answers) => {
+            try {
+              systemAction(answers, systemRequestTypeRef.current);
+              setCompletedMessages((prev) => [
+                ...prev,
+                { id: nextId(), type: "assistant", content: `Configuration for ${answers[0]} Model Initialized! Restart to apply.` },
+              ]);
+            } catch (error) {
+              setCompletedMessages((prev) => [
+                ...prev,
+                { id: nextId(), type: "assistant", content: `Error while performing operation` },
+              ])
+            } finally {
+              systemRequestTypeRef.current = null
+              setSystemRequests(null);
+            }
+          }}
+        />
+      ) : pendingRequest ? (
         <AskUserPrompt request={pendingRequest} onAnswer={handleUserAnswer} />
       ) : (
         <TextInput onSubmit={handleSubmit} isDisabled={isLoading} commands={commands} />
