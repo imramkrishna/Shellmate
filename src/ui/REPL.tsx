@@ -176,13 +176,21 @@ export function REPL({ apiKey, model }: REPLProps) {
         <AskSystemMessage
           requests={systemRequests}
           onComplete={(answers) => {
-            systemAction(answers, systemRequestTypeRef.current);
-            systemRequestTypeRef.current=null
-            setSystemRequests(null);
-            setCompletedMessages((prev) => [
-              ...prev,
-              { id: nextId(), type: "assistant", content: `Configuration for ${answers[0]} Model Initialized! Restart to apply.` },
-            ]);
+            try {
+              systemAction(answers, systemRequestTypeRef.current);
+              setCompletedMessages((prev) => [
+                ...prev,
+                { id: nextId(), type: "assistant", content: `Configuration for ${answers[0]} Model Initialized! Restart to apply.` },
+              ]);
+            } catch (error) {
+              setCompletedMessages((prev) => [
+                ...prev,
+                { id: nextId(), type: "assistant", content: `Error while performing operation` },
+              ])
+            } finally {
+              systemRequestTypeRef.current = null
+              setSystemRequests(null);
+            }
           }}
         />
       ) : pendingRequest ? (
