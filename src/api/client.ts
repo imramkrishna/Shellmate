@@ -7,9 +7,11 @@ const OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1";
 
 export class OpenRouterClient {
   private apiKey: string;
+  private max_tokens:number
 
-  constructor(apiKey: string) {
+  constructor(apiKey: string,max_tokens=2000) {
     this.apiKey = apiKey;
+    this.max_tokens=max_tokens
   }
 
   async *streamChatCompletion(
@@ -23,7 +25,7 @@ export class OpenRouterClient {
         "HTTP-Referer": "https://github.com/ShellMate",
         "X-Title": "ShellMate",
       },
-      body: JSON.stringify({ ...request, stream: true, max_tokens:2000}),
+      body: JSON.stringify({ ...request, stream: true,max_tokens:this.max_tokens}),
     });
 
     if (!response.ok) {

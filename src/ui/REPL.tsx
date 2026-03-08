@@ -15,7 +15,8 @@ import {
   type UserInputRequest,
 } from "../utils/askUserBridge.js";
 import { AskSystemMessage } from "./components/AskSystemMessage.js";
-import { changeModelRequests, systemAction } from "./lib/shortcuts.js";
+import { changeMaxTokens, changeModelRequests, systemAction } from "./lib/shortcuts.js";
+import getMaxTokensConfig from "../utils/getMaxTokensConfig.js";
 interface REPLProps {
   apiKey: string;
   model: string;
@@ -33,7 +34,7 @@ export function REPL({ apiKey, model }: REPLProps) {
   const [isExecutingTools, setIsExecutingTools] = useState(false);
   const [commands, setCommands] = useState<string[]>([]);
   const msgIdRef = useRef(0);
-
+  const maxTokensRef=useRef(getMaxTokensConfig().get("MAX_TOKENS"))
   // Ask-user bridge state
   const [pendingRequest, setPendingRequest] = useState<UserInputRequest | null>(null);
   const resolverRef = useRef<((answer: string) => void) | null>(null);
@@ -70,7 +71,7 @@ export function REPL({ apiKey, model }: REPLProps) {
   }, []);
 
   const conversationRef = useRef(
-    new Conversation(new OpenRouterClient(apiKey), model)
+    new Conversation(new OpenRouterClient(apiKey,maxTokensRef.current), model)
   );
 
   const nextId = useCallback(() => {
@@ -87,6 +88,11 @@ export function REPL({ apiKey, model }: REPLProps) {
       if (input.toLowerCase() === "/change-model" || input.toLowerCase() === "change-model") {
         systemRequestTypeRef.current = "change-model";
         setSystemRequests(changeModelRequests);
+        return;
+      }
+      if (input.toLowerCase() === "/maxtokens" || input.toLowerCase() === "maxtokens") {
+        systemRequestTypeRef.current = "maxtokens";
+        setSystemRequests(changeMaxTokens);
         return;
       }
       setCompletedMessages((prev) => [
@@ -180,12 +186,12 @@ export function REPL({ apiKey, model }: REPLProps) {
               systemAction(answers, systemRequestTypeRef.current);
               setCompletedMessages((prev) => [
                 ...prev,
-                { id: nextId(), type: "assistant", content: `Configuration for ${answers[0]} Model Initialized! Restart to apply.` },
+                { id: nextId(), type: "assistant", content: `Configuration Applied. Restart to apply. ` },
               ]);
             } catch (error) {
               setCompletedMessages((prev) => [
                 ...prev,
-                { id: nextId(), type: "assistant", content: `Error while performing operation` },
+                { id: nextId(), type: "assistant", content: `Error while performing operation. ` },
               ])
             } finally {
               systemRequestTypeRef.current = null

@@ -93,8 +93,8 @@ export function WelcomeScreen({
   const right: string[] = [
     " " + ab("Quick commands"),
     " " + dm("/help") + "      Show all commands",
-    " " + dm("/model") + "     Change AI model",
-    " " + dm("/clear") + "     Clear conversation",
+    " " + dm("/change-model") + "     Change AI model",
+    " " + dm("/maxtokens") + "     Change Max Tokens per Request",
     " " + ac(dashedLine(Math.max(0, rw - 2))),
     " " + ab("What's new"),
     " Multi-tool execution",
