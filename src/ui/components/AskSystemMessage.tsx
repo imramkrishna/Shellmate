@@ -32,11 +32,12 @@ export function AskSystemMessage({ requests, onComplete }: AskSystemMessageProps
 
     const handleTextSubmit = useCallback(
         (value: string) => {
+            if (!current) return;
             const trimmed = value.trim();
             if (current.required && !trimmed) return;
             advance(trimmed);
         },
-        [current.required, advance]
+        [current, advance]
     );
 
     const handleSelect = useCallback(
