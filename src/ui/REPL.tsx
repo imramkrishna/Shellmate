@@ -14,7 +14,8 @@ import {
   clearInputHandler,
   type UserInputRequest,
 } from "../utils/askUserBridge.js";
-
+import { AskSystemMessage } from "./components/AskSystemMessage.js";
+import { changeModelRequests, saveModelConfig } from "./lib/shortcuts.js";
 interface REPLProps {
   apiKey: string;
   model: string;
@@ -36,7 +37,7 @@ export function REPL({ apiKey, model }: REPLProps) {
   // Ask-user bridge state
   const [pendingRequest, setPendingRequest] = useState<UserInputRequest | null>(null);
   const resolverRef = useRef<((answer: string) => void) | null>(null);
-
+  const [systemRequests, setSystemRequests] = useState<UserInputRequest[] | null>(null);
   // Register the input handler bridge on mount
   useEffect(() => {
     setInputHandler((request: UserInputRequest) => {
@@ -83,8 +84,10 @@ export function REPL({ apiKey, model }: REPLProps) {
         exit();
         return;
       }
-
-      // Add user message
+      if(input.toLowerCase()==="/change-model" || input.toLowerCase()==="change-model"){
+         setSystemRequests(changeModelRequests);
+         return;
+      }
       setCompletedMessages((prev) => [
         ...prev,
         { id: nextId(), type: "user", content: input },
@@ -167,7 +170,20 @@ export function REPL({ apiKey, model }: REPLProps) {
         isLoading={isLoading}
         isExecutingTools={isExecutingTools}
       />
-      {pendingRequest ? (
+
+      {systemRequests ? (
+        <AskSystemMessage
+          requests={systemRequests}
+          onComplete={(answers) => {
+            saveModelConfig(answers);
+            setSystemRequests(null);
+            setCompletedMessages((prev) => [
+              ...prev,
+              { id: nextId(), type: "assistant", content: `Configuration for ${answers[0]} Model Initialized! Restart to apply.` },
+            ]);
+          }}
+        />
+      ) : pendingRequest ? (
         <AskUserPrompt request={pendingRequest} onAnswer={handleUserAnswer} />
       ) : (
         <TextInput onSubmit={handleSubmit} isDisabled={isLoading} commands={commands} />
