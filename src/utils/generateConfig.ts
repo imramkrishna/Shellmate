@@ -19,11 +19,9 @@ async function generateConfig() {
     console.log("Initializing ai model and API KEY")
     const AI_MODEL = await question(rl, "Enter AI_MODEL : ")
     const API_KEY = await question(rl, "Enter Open Router Api Key : ")
-
     const fileContent = `AI_MODEL=${AI_MODEL}\nAPI_KEY=${API_KEY}`
     fs.mkdirSync(".shellmate", { recursive: true })
     fs.writeFileSync(".shellmate/keys.txt", fileContent)
-    console.log(`Configuration for ${AI_MODEL} Model Initialized!`)
     rl.close()
 }
 
